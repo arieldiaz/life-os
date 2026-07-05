@@ -1,0 +1,18 @@
+# The stream lives OUTSIDE this repo entirely (see STREAM.md).
+# If raw stream files ever show up in here, something is wrong —
+# this pattern is a tripwire, not an invitation.
+stream/
+
+# ── Obsidian ─────────────────────────────────────────────────
+# Track shared vault config if you want consistent settings
+# across machines; never track per-machine workspace state.
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/plugins/*/data.json
+
+# ── Machine-local pipeline config ────────────────────────────
+ops/stream-paths.env
+
+# ── macOS noise ──────────────────────────────────────────────
+.DS_Store
