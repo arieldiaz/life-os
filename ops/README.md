@@ -1,0 +1,61 @@
+# ops/ — the stream pipeline
+
+Capture → sync → transcribe → backup, all local. MacBook records, mini keeps and computes, NAS archives. See [STREAM.md](../STREAM.md) for the architecture; this is the setup guide.
+
+**These scripts are a working first draft** — written blind against your machines. Test each stage with junk files before trusting it with real life. The delete-from-MacBook step in particular: run it a few times watching both ends.
+
+## One-time setup
+
+### Config (both machines)
+
+```bash
+cp ops/stream-paths.env.example ops/stream-paths.env
+# edit paths, hostnames, capture dirs — this file is gitignored
+chmod +x ops/macbook/*.sh ops/mini/*.sh
+
+# the plists ship with /Users/you placeholders — point them at your account:
+LC_ALL=C sed -i '' "s|/Users/you|/Users/$USER|g" ops/macbook/*.plist ops/mini/*.plist
+```
+
+### MacBook
+
+1. **SSH to the mini without a password:** `ssh-keygen -t ed25519` (if needed), then `ssh-copy-id you@mini.local`. Verify `ssh mini.local true` returns silently.
+2. **Point recorders at a capture dir.** Everything you record on the computer should land in one of `CAPTURE_DIRS` — QuickTime's save location, your screen-record folder, your dictation app's "save audio" folder. If an app insists on its own location, add that location to `CAPTURE_DIRS` instead of fighting it.
+3. **Install the agents** (edit repo paths in the plists first if yours differs):
+
+```bash
+cp ops/macbook/com.lifeos.{ingest,sync}.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.lifeos.ingest.plist
+launchctl load ~/Library/LaunchAgents/com.lifeos.sync.plist
+```
+
+### Mac mini
+
+1. **Whisper:** `pip install mlx-whisper` (Apple Silicon; needs `brew install ffmpeg`). First run downloads the model. Alternatives (openai-whisper, whisper.cpp) work — adjust `WHISPER_CMD` and, if needed, the one command line in `transcribe-watch.sh`.
+2. **Repo on the mini too:** clone the repo so transcripts land in its `derived/` (git is how derived text gets back to the MacBook — commit/pull, or sync the folder however you sync the vault).
+3. **Install the agents:**
+
+```bash
+cp ops/mini/com.lifeos.{transcribe,nasbackup}.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.lifeos.transcribe.plist
+launchctl load ~/Library/LaunchAgents/com.lifeos.nasbackup.plist
+```
+
+4. **QNAP:** mount the backup share at `NAS_BACKUP_DIR` (Finder → ⌘K → `smb://qnap.local/...`, then add to Login Items so it remounts). On the QNAP itself: enable scheduled snapshots on the share. Ethernet to the mini, as planned — transcription doesn't care, but backup of video will.
+
+## How it flows
+
+| Stage | Where | Cadence | What |
+|-------|-------|---------|------|
+| Ingest | MacBook | 2 min | New A/V in capture dirs → `$STREAM_LOCAL/YYYY/MM/DD/HHMM-slug.ext`. Skips files still being written. |
+| Sync | MacBook | 5 min | Spool → mini, checksum-verified, **then deleted from MacBook**. Mini offline? Spool waits; nothing lost. |
+| Transcribe | mini | 5 min | New A/V → Whisper → `derived/transcripts/.../HHMM-slug.md`, timestamped lines + provenance header. Done-ness = transcript exists. |
+| Backup | mini | nightly 03:30 | Canonical store → NAS, no `--delete` ever. |
+
+## Live sessions vs. the archive
+
+This pipeline is the *archive* path. For **live** voice during sessions (dictating to Claude, live meeting transcription), use whatever tool feels best in the moment — the only rule is its audio artifact must also land in a `CAPTURE_DIRS` folder, so the archive path picks it up regardless. Live use and archival capture are two consumers of the same recording, not two recordings.
+
+## Debugging
+
+Logs: `~/Library/Logs/lifeos-*.log` on each machine. Kick a job manually: `launchctl start com.lifeos.sync`. Common gotchas: launchd needs Full Disk Access for bash/scripts touching protected folders (System Settings → Privacy & Security); `mlx_whisper` not found under launchd → the PATH line in the transcribe plist covers homebrew/pip defaults, extend it if your install lives elsewhere.
