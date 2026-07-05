@@ -52,6 +52,16 @@ launchctl load ~/Library/LaunchAgents/com.lifeos.nasbackup.plist
 | Transcribe | mini | 5 min | New A/V → Whisper → `derived/transcripts/.../HHMM-slug.md`, timestamped lines + provenance header. Done-ness = transcript exists. |
 | Backup | mini | nightly 03:30 | Canonical store → NAS, no `--delete` ever. |
 
+## Performance: the pipeline never fights the human
+
+Two mechanisms keep background work invisible, both on by default:
+
+**QoS.** Every plist runs its job as `ProcessType: Background` with `LowPriorityIO` — on Apple Silicon that means efficiency cores and throttled disk, so the OS itself deprioritizes the pipeline whenever anything interactive wants the machine. Transcription gets slower; nobody is waiting on it.
+
+**The gate.** Heavy jobs (sync, transcribe, backup) source `lib/gate.sh` and exit early — deferring to a later launchd tick — when the machine is busy: OBS running, user active in the last 5 minutes, or on battery. Because every job is interval-based and idempotent, deferring costs nothing; the spool holds, the work happens on the next quiet tick. Sync additionally caps its upload at `SYNC_BWLIMIT` (default 8 MiB/s) so a multi-GB recording can't starve a live stream's bitrate even when it does run. Tune or disable any gate in `stream-paths.env` — knobs documented in `stream-paths.env.example`.
+
+The design principle: never kill, defer. Pausing new work is free and resumable; killing running work risks half-written state.
+
 ## Live sessions vs. the archive
 
 This pipeline is the *archive* path. For **live** voice during sessions (dictating to Claude, live meeting transcription), use whatever tool feels best in the moment — the only rule is its audio artifact must also land in a `CAPTURE_DIRS` folder, so the archive path picks it up regardless. Live use and archival capture are two consumers of the same recording, not two recordings.

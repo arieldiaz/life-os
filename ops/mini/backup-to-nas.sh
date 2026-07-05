@@ -4,7 +4,11 @@
 # ever vanish from the backup — if a source file disappears, the backup
 # keeping it is a feature, not drift.
 set -euo pipefail
-source "$(cd "$(dirname "$0")/.." && pwd)/stream-paths.env"
+OPS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$OPS_DIR/stream-paths.env"
+source "$OPS_DIR/lib/gate.sh"
+
+defer_if_busy nas-backup
 
 if [ ! -d "$NAS_BACKUP_DIR" ]; then
   echo "$(date '+%F %T') NAS not mounted at $NAS_BACKUP_DIR — SKIPPED" >&2
