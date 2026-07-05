@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Ingest: normalize new recordings from capture locations into the spool.
-# Runs every 2 min via launchd. Only touches A/V files that have been
-# stable for >1 minute (so in-progress recordings are left alone).
+# Ingest: normalize new recordings, screenshots, and images from capture
+# locations into the spool. Runs every 2 min via launchd. Only touches
+# files stable for >1 minute (so in-progress recordings are left alone).
 set -euo pipefail
 source "$(cd "$(dirname "$0")/.." && pwd)/stream-paths.env"
 
-EXT_PATTERN='^(m4a|wav|mp3|aiff|aif|flac|mov|mp4|m4v|mkv|webm|ogg|opus)$'
+EXT_PATTERN='^(png|jpg|jpeg|heic|heif|gif|webp|tiff|bmp|m4a|wav|mp3|aiff|aif|flac|mov|mp4|m4v|mkv|webm|ogg|opus)$'
 
 for dir in "${CAPTURE_DIRS[@]}"; do
   [ -d "$dir" ] || continue
