@@ -28,11 +28,28 @@ Automated ingest derives the timestamp from the file's modification time and the
 
 ## Rules (unchanged, non-negotiable)
 
-1. **Append-only.** Never edit, rename, move, or delete events. Corrections are new events.
+1. **Append-only.** Never edit, rename, move, or delete events. Corrections are new events. (One exception: secrets — see "What never enters the stream.")
 2. **Rawest form available.** Audio over transcript, original file over description.
 3. **No taxonomy.** Date + slug. Finding things is the job of derived indexes and transcripts.
 4. **When in doubt, capture.** The filter is at derivation time.
 5. **Tier 0 privacy.** Raw stream data stays on this network. Local models (Whisper, Qwen on the mini) do the deriving. Cloud models see derived text (Tier 1) and curated memory (Tier 2), and touch a raw item only when a human hands it over explicitly, per item.
+
+## What never enters the stream
+
+Append-only cuts both ways: whatever gets captured is kept forever, so a few things must never be captured. "When in doubt, capture" does not apply to:
+
+- **Credentials in any form** — password manager windows, API keys, `.env` contents, tokens, recovery phrases, 2FA codes and their QR codes, banking and login screens. (Credential *files* can't enter — ingest only accepts image/A/V extensions — but a *screenshot* of one can. Don't take it, or take it into `private/`.)
+- **Private browsing** — incognito/private windows are private from your own archive too.
+- **Other people's confidences** — screens or messages shared with you on the understanding they wouldn't be kept.
+
+Tier 0 being local-only is not a defense here: the stream is backed up to the NAS, mirrored across machines, and served over SMB. Credentials don't belong in *any* archive.
+
+**Escape hatches** (enforced by `ops/` ingest):
+
+- A `private/` subfolder inside any capture dir is never ingested. Screenshot freely into it; it stays out of the archive. Empty it yourself on whatever schedule you like.
+- Filenames containing `noarchive` or ending in `-private` are skipped.
+
+**The secrets exception — the one exception to append-only:** if a secret slips into the stream anyway, delete that event immediately and add a small correction event noting what was deleted and why (never the secret itself). Then rotate the credential — an archive that briefly held a key means the key is burned. A permanent copy of a leaked credential is a liability, not history.
 
 ## Pipeline
 

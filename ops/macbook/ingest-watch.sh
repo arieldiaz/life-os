@@ -9,7 +9,8 @@ EXT_PATTERN='^(png|jpg|jpeg|heic|heif|gif|webp|tiff|bmp|m4a|wav|mp3|aiff|aif|fla
 
 for dir in "${CAPTURE_DIRS[@]}"; do
   [ -d "$dir" ] || continue
-  find "$dir" -maxdepth 2 -type f -mmin +1 ! -name ".*" -print0 |
+  find "$dir" -maxdepth 2 -type f -mmin +1 ! -name ".*" \
+       ! -path "*/private/*" ! -iname "*noarchive*" ! -iname "*-private.*" -print0 |
   while IFS= read -r -d '' f; do
     base="$(basename "$f")"
     ext="$(printf '%s' "${base##*.}" | tr '[:upper:]' '[:lower:]')"
