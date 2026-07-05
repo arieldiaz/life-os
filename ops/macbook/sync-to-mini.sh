@@ -2,12 +2,10 @@
 # Sync: spool → mini canonical store, verified, then DELETE from MacBook.
 # Runs every 5 min via launchd. If the mini is unreachable (off network),
 # the spool simply accumulates until it isn't — nothing is lost.
+# If MINI_REPO_DIR is set, also pulls derived/ text (transcripts) back from
+# the mini — same direction of trust: the MacBook initiates everything.
 set -euo pipefail
 source "$(cd "$(dirname "$0")/.." && pwd)/stream-paths.env"
-
-[ -d "$STREAM_LOCAL" ] || exit 0
-# anything to ship?
-find "$STREAM_LOCAL" -type f ! -name ".DS_Store" | head -1 | grep -q . || exit 0
 
 # reachability check — bail quietly if the mini isn't there
 ssh -o ConnectTimeout=5 -o BatchMode=yes "$MINI_USER@$MINI_HOST" true 2>/dev/null || {
@@ -15,13 +13,24 @@ ssh -o ConnectTimeout=5 -o BatchMode=yes "$MINI_USER@$MINI_HOST" true 2>/dev/nul
   exit 0
 }
 
-# --checksum: verify content, not just size/mtime.
-# --remove-source-files: rsync deletes each source file ONLY after
-# that file transferred successfully. This is the delete-from-MacBook step.
-rsync -a --checksum --partial --remove-source-files \
-  --exclude ".DS_Store" \
-  "$STREAM_LOCAL/" "$MINI_USER@$MINI_HOST:$STREAM_CANONICAL/"
+# ship the spool, if there's anything in it
+if [ -d "$STREAM_LOCAL" ] && find "$STREAM_LOCAL" -type f ! -name ".DS_Store" | head -1 | grep -q .; then
+  # --checksum: verify content, not just size/mtime.
+  # --remove-source-files: rsync deletes each source file ONLY after
+  # that file transferred successfully. This is the delete-from-MacBook step.
+  rsync -a --checksum --partial --remove-source-files \
+    --exclude ".DS_Store" \
+    "$STREAM_LOCAL/" "$MINI_USER@$MINI_HOST:$STREAM_CANONICAL/"
 
-# sweep now-empty date directories from the spool
-find "$STREAM_LOCAL" -mindepth 1 -type d -empty -delete
-echo "$(date '+%F %T') sync complete; spool cleared"
+  # sweep now-empty date directories from the spool
+  find "$STREAM_LOCAL" -mindepth 1 -type d -empty -delete
+  echo "$(date '+%F %T') sync complete; spool cleared"
+fi
+
+# pull derived text back from the mini. Safe to mirror: derived/ is
+# disposable and the mini's copy is canonical (README.md stays git's).
+if [ -n "${MINI_REPO_DIR:-}" ]; then
+  rsync -a --delete --exclude ".DS_Store" --exclude "README.md" \
+    "$MINI_USER@$MINI_HOST:$MINI_REPO_DIR/derived/" "$REPO_DIR/derived/"
+  echo "$(date '+%F %T') derived/ pulled from mini"
+fi
