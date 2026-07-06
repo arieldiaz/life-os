@@ -65,7 +65,7 @@ life-os/
 
 ## Agents: few loops, many hats
 
-Where most frameworks spawn an agent per task, life-os keeps **a small roster of durable agents** — persistent working relationships that accumulate context — and has them wear the skills as hats. [Liv](agents/liv.md) (Chief of Staff) runs the week: triage, orientation, reviews, memory curation. [Max](agents/max.md) (CEO) runs the quarter: strategy, tracks, tradeoffs, the discipline of not doing things. You are the board. Continuity is the point: ephemeral agents start from zero every time; durable agents compound, which is the same bet the rest of this system makes. Details and rules in [agents/README.md](agents/README.md).
+Where most frameworks spawn an agent per task, life-os keeps **a small roster of durable agents** — persistent working relationships that accumulate context — and has them wear the skills as hats. [Liv](agents/liv.md) (personal Chief of Staff) runs the life outside work and the loop itself: personal ops, household, triage, orientation, reviews, memory curation. [Max](agents/max.md) (CEO) runs the work: strategy, tracks, tradeoffs, the discipline of not doing things. The line between them is personal/work, not operational/strategic. You are the board. Continuity is the point: ephemeral agents start from zero every time; durable agents compound, which is the same bet the rest of this system makes. Details and rules in [agents/README.md](agents/README.md).
 
 ## Day to day
 

@@ -8,8 +8,10 @@ Why fewer is better here: continuity is the compounding surface. A hundred ephem
 
 | Agent | Role | Owns |
 |-------|------|------|
-| [Liv](liv.md) | Chief of Staff | The loop's cadence: triage, orientation, reviews, memory curation. Runs the week. |
-| [Max](max.md) | CEO | Direction: STRATEGY.md, tracks, tradeoffs, saying no. Runs the quarter. |
+| [Liv](liv.md) | Personal Chief of Staff | The life outside work — personal ops, household, coordination — plus the loop's cadence: triage, orientation, reviews, memory curation. Runs the week. |
+| [Max](max.md) | CEO | The work: strategy, tracks, priorities, tradeoffs, saying no. Runs the quarter. |
+
+The line between them is domain, not altitude: a work question at any altitude is Max's; a personal one at any altitude is Liv's. Cadence spans both — Liv runs the review mechanics either way, and hands the work calls to Max.
 
 You are the board. Agents advise and execute; you own the votes that matter.
 
