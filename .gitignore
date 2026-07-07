@@ -14,5 +14,14 @@ stream/
 # ── Machine-local pipeline config ────────────────────────────
 ops/stream-paths.env
 
+# ── Secrets ──────────────────────────────────────────────────
+# Real values live in self-hosted Infisical (infra/secrets/runbook.md).
+# .env files never get committed; .env.example placeholders do.
+# infra/secrets/.env is the Infisical bootstrap secret — committing it
+# would be catastrophic.
+.env
+.env.*
+!.env.example
+
 # ── macOS noise ──────────────────────────────────────────────
 .DS_Store
