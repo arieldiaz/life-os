@@ -13,6 +13,10 @@
     <key>Hour</key><integer>3</integer>
     <key>Minute</key><integer>30</integer>
   </dict>
+  <!-- politeness: E-cores + throttled disk I/O; interactive work always wins -->
+  <key>ProcessType</key><string>Background</string>
+  <key>LowPriorityIO</key><true/>
+  <key>Nice</key><integer>10</integer>
   <key>StandardOutPath</key><string>/Users/you/Library/Logs/lifeos-nasbackup.log</string>
   <key>StandardErrorPath</key><string>/Users/you/Library/Logs/lifeos-nasbackup.log</string>
 </dict>

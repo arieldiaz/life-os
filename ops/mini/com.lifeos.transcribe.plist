@@ -15,6 +15,10 @@
     <!-- so launchd finds mlx_whisper/ffmpeg installed via brew/pip -->
     <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
   </dict>
+  <!-- politeness: E-cores + throttled disk I/O; interactive work always wins -->
+  <key>ProcessType</key><string>Background</string>
+  <key>LowPriorityIO</key><true/>
+  <key>Nice</key><integer>10</integer>
   <key>StandardOutPath</key><string>/Users/you/Library/Logs/lifeos-transcribe.log</string>
   <key>StandardErrorPath</key><string>/Users/you/Library/Logs/lifeos-transcribe.log</string>
 </dict>

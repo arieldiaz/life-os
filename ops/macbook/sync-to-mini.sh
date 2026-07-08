@@ -5,7 +5,16 @@
 # If MINI_REPO_DIR is set, also pulls derived/ text (transcripts) back from
 # the mini — same direction of trust: the MacBook initiates everything.
 set -euo pipefail
-source "$(cd "$(dirname "$0")/.." && pwd)/stream-paths.env"
+OPS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$OPS_DIR/stream-paths.env"
+source "$OPS_DIR/lib/gate.sh"
+
+# never fight a live stream, an active user, or the battery for bandwidth
+defer_if_busy sync
+
+# cap upload rate (KiB/s) so a big recording never starves whatever the
+# network is doing when the gate does let us through; set "" to uncap
+SYNC_BWLIMIT="${SYNC_BWLIMIT-8192}"
 
 # reachability check — bail quietly if the mini isn't there
 ssh -o ConnectTimeout=5 -o BatchMode=yes "$MINI_USER@$MINI_HOST" true 2>/dev/null || {
@@ -19,6 +28,7 @@ if [ -d "$STREAM_LOCAL" ] && find "$STREAM_LOCAL" -type f ! -name ".DS_Store" | 
   # --remove-source-files: rsync deletes each source file ONLY after
   # that file transferred successfully. This is the delete-from-MacBook step.
   rsync -a --checksum --partial --remove-source-files \
+    ${SYNC_BWLIMIT:+--bwlimit="$SYNC_BWLIMIT"} \
     --exclude ".DS_Store" \
     "$STREAM_LOCAL/" "$MINI_USER@$MINI_HOST:$STREAM_CANONICAL/"
 

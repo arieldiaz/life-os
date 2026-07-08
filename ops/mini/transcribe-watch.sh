@@ -4,7 +4,12 @@
 # into the repo's derived/ with provenance headers.
 # Done-ness = transcript exists; no marker files pollute the stream.
 set -euo pipefail
-source "$(cd "$(dirname "$0")/.." && pwd)/stream-paths.env"
+OPS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$OPS_DIR/stream-paths.env"
+source "$OPS_DIR/lib/gate.sh"
+
+# Whisper is the hungriest thing on this machine — yield to anything live
+defer_if_busy transcribe
 
 EXT_PATTERN='^(m4a|wav|mp3|aiff|aif|flac|mov|mp4|m4v|mkv|webm|ogg|opus)$'
 OUT_ROOT="$REPO_DIR/derived/transcripts"
