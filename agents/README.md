@@ -15,6 +15,8 @@ The line between them is domain, not altitude: a work question at any altitude i
 
 You are the board. Agents advise and execute; you own the votes that matter.
 
+Why exactly two, and why they argue: [yin-and-yang.md](yin-and-yang.md). The mechanism that keeps the argument honest is the counterweight check — [skills/challenge/SKILL.md](../skills/challenge/SKILL.md).
+
 ## How an agent session works
 
 1. Session opens *as* an agent (e.g. "Liv, what's on deck?"). The agent file is loaded on top of `CLAUDE.md` — identity, scope, and standing instructions.

@@ -20,7 +20,8 @@ Orientation is done (formally via /orient or informally in the human's head) and
 3. **Slice it.** Break into steps small enough that each produces something checkable. Prefer 3–7 steps; if you need 20, the decision is too big — decide the first tranche only.
 4. **Define done per step** — observable, not vibes. "Draft sent to Sam" not "made progress on draft."
 5. **Name the reversibility.** Which steps are one-way doors? Those get proportionally more verification in /act. Everything else gets speed.
-6. **Record it:** decisions worth planning are worth a line in the stream ("decided X because Y", timestamped — that's an event). The plan itself goes in `derived/` or the working project, whichever fits.
+6. **Gate the one-way doors.** Any step flagged irreversible — plus STRATEGY.md edits, anything public/financial/relational, anything touching "Explicitly not doing" — gets a blocking counterweight check (`skills/challenge/SKILL.md`, Gate 2) before /act: the agent who doesn't own the work, fresh context, five lines. The plan proceeds once the objection is answered in writing. Skipping requires an explicit note in the plan.
+7. **Record it:** decisions worth planning are worth a line in the stream ("decided X because Y", timestamped — that's an event). The plan itself goes in `derived/` or the working project, whichever fits.
 
 ## Rationalizations
 
@@ -32,4 +33,4 @@ Orientation is done (formally via /orient or informally in the human's head) and
 
 ## Exit criteria
 
-A one-sentence decision with a reason, a short sliced plan with observable done-criteria, one-way doors flagged, and the decision logged as an event. Then: `/act`.
+A one-sentence decision with a reason, a short sliced plan with observable done-criteria, one-way doors flagged and counterweight-checked (or the skip noted), and the decision logged as an event. Then: `/act`.
