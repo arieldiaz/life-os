@@ -24,7 +24,8 @@ A piece of work finished (or died); the weekly strategy review; an outcome surpr
    - **Strategy:** did this serve "What matters now," or was it well-executed drift?
    - **Surprise:** what did you not see coming? (This lens feeds /compound most.)
 4. **Say the uncomfortable thing plainly.** If the work was fine but pointless, say pointless. If the plan was abandoned silently, say so. Kindly, and without the sandwich.
-5. **Tag candidates for compounding:** 1–3 observations that might be durable lessons. Not everything — the review's job is finding; /compound's job is deciding what keeps.
+5. **Invite the counterweight.** For any significant chunk, the agent who didn't own the work appends a five-line challenge from the opposite pole (`skills/challenge/SKILL.md`, Gate 1) — non-blocking; it feeds /compound and the next /decide. In the weekly, this is the work agent's standing dissent paragraph.
+6. **Tag candidates for compounding:** 1–3 observations that might be durable lessons. Not everything — the review's job is finding; /compound's job is deciding what keeps.
 
 For the **weekly review**: same lenses, but the "work" is the week and the plan is STRATEGY.md's tracks. End by updating track states.
 
@@ -38,4 +39,4 @@ For the **weekly review**: same lenses, but the "work" is the week and the plan 
 
 ## Exit criteria
 
-A written gap-analysis (a paragraph is fine for small work) in `derived/` or the project, and explicit candidates handed to `/compound` — or an explicit "nothing durable here."
+A written gap-analysis (a paragraph is fine for small work) in `derived/` or the project, the counterweight's challenge attached for significant work, and explicit candidates handed to `/compound` — or an explicit "nothing durable here."
