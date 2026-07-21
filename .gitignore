@@ -15,10 +15,9 @@ stream/
 ops/stream-paths.env
 
 # ── Secrets ──────────────────────────────────────────────────
-# Real values live in self-hosted Infisical (infra/secrets/runbook.md).
-# .env files never get committed; .env.example placeholders do.
-# infra/secrets/.env is the Infisical bootstrap secret — committing it
-# would be catastrophic.
+# Real values live in the secrets manager (infra/secrets/runbook.md;
+# Doppler by default). .env files never get committed; .env.example
+# placeholders do.
 .env
 .env.*
 !.env.example
