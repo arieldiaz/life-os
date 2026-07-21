@@ -129,10 +129,10 @@ Everything here is a draft of your system, not the system. The skills are prose 
 
 ### The template/instance pattern
 
-This repo is a **GitHub template**, meant to stay generic. Your life goes in a private instance:
+This repo is the public framework, meant to stay generic. Your life goes in a private instance — full mechanics in [docs/adopt.md](docs/adopt.md):
 
-1. **Create your instance:** "Use this template" (or fork) → a *private* repo named `<you>-os`. That's where STRATEGY.md gets filled, `memory/` accumulates, and your machines' config lives. Nothing personal ever goes in the template.
-2. **Wire the upstream:** in your instance, `git remote add upstream https://github.com/arieldiaz/life-os.git`. Pull framework improvements down with `git fetch upstream && git merge upstream/main` (expect small, clean merges — the template only holds generic files).
+1. **Create your instance:** clone this repo and push it to a fresh *private* repo named `<you>-os`, keeping life-os wired as the `upstream` remote. (Not GitHub's "Use this template" button — it severs the shared history that keeps upstream merges clean; see [docs/adopt.md](docs/adopt.md).) The instance is where STRATEGY.md gets filled, `memory/` accumulates, and your machines' config lives. Nothing personal ever goes in the framework repo.
+2. **Pull framework improvements down** with `git fetch upstream && git merge upstream/main` — the shared merge-base keeps these small and clean.
 3. **Send improvements back — deliberately, never wholesale.** When living in your instance produces a structural improvement (a sharper skill, a better rule, a pipeline fix), *genericize it* — strip names, paths, personal context — commit it on a branch cut from `upstream/main`, and PR it here. The flow is one-way by default: instance → template only by extraction, template → instance by merge.
 4. Keep agent definition files template-clean in your instance too: what Liv and Max *are* belongs in `agents/`; what they *know about you* belongs in your `memory/`. This keeps upstream merges painless and your private context private.
 
