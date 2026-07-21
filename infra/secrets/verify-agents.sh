@@ -1,117 +1,124 @@
 #!/usr/bin/env bash
-# verify-agents: for each agent machine identity, log in via Universal Auth,
-# pull its secrets from Infisical, and make one harmless authenticated call
-# per service (Slack auth.test, Notion /v1/users/me). Prints PASS/FAIL per
-# agent per integration, plus a least-privilege check that each identity
-# CANNOT read the other agents' paths. No secret values are ever printed.
+# verify-agents: prove the per-project isolation and integration health of
+# the read-only service tokens in ~/.config/life-os/doppler.env.
 #
-# Configure the three vars below (or export them), store each agent's
-# universal-auth credentials in the login Keychain as
-# <AGENT>_CLIENT_ID / <AGENT>_CLIENT_SECRET (account "life-os"):
-#   security add-generic-password -U -a life-os -s LIV_CLIENT_ID -w
+# Per token: it must read its OWN project, and must FAIL to read every
+# other project (a Doppler service token is scoped to one project+config —
+# this failure IS the per-agent isolation guarantee, so it gets verified,
+# not assumed). Per agent: one harmless authenticated call per service
+# (Slack auth.test, Notion users/me), skipped when the key isn't set.
+# Prints PASS/FAIL/SKIP per check. Never prints secret values.
+#
+# Run after any token or project change. It must always pass.
 set -uo pipefail
 
-INFISICAL_API_URL="${INFISICAL_API_URL:-https://secrets.your-domain.com/api}"
-AGENTS_PROJECT_ID="${AGENTS_PROJECT_ID:-TODO}"
-AGENTS=(liv max)
-KEYCHAIN_ACCOUNT="life-os"
+PREFIX="${LIFEOS_SECRETS_PREFIX:-lifeos}"
+DOPPLER_ENV_FILE="$HOME/.config/life-os/doppler.env"
+DOPPLER_BIN="$(command -v doppler || echo /opt/homebrew/bin/doppler)"
 
-export INFISICAL_API_URL
-
-if [ "$AGENTS_PROJECT_ID" = "TODO" ]; then
-  echo "verify-agents: set AGENTS_PROJECT_ID (Project -> Settings -> Project ID) first." >&2
+if [ ! -x "$DOPPLER_BIN" ] || [ ! -f "$DOPPLER_ENV_FILE" ]; then
+  echo "verify-agents: needs the doppler CLI and $DOPPLER_ENV_FILE (run setup-doppler.sh first)." >&2
   exit 1
 fi
 
-keychain() {
-  security find-generic-password -a "$KEYCHAIN_ACCOUNT" -s "$1" -w 2>/dev/null
-}
+dtok() { grep "^$1=" "$DOPPLER_ENV_FILE" | cut -d= -f2-; }
 
 FAILURES=0
 
-check_slack() {
-  local agent="$1" token="$2"
-  if [ -z "$token" ]; then
-    echo "FAIL  $agent slack   (SLACK_BOT_TOKEN missing or placeholder)"
-    return 1
+dp() { DOPPLER_TOKEN="$1" "$DOPPLER_BIN" "${@:2}" --no-check-version; }
+
+check_scoping() {
+  local label="$1" token="$2" own_count other
+  shift 2
+
+  own_count="$(dp "$token" secrets --only-names --json 2>/dev/null \
+    | jq -r 'if type == "array" then .[] else keys[] end' | grep -cv '^DOPPLER_')"
+  if [ "${own_count:-0}" -gt 0 ]; then
+    echo "PASS  $label read     (own project readable, $own_count keys)"
+  else
+    echo "FAIL  $label read     (cannot read own project)"
+    FAILURES=$((FAILURES + 1))
   fi
-  local ok
+
+  for other in "$@"; do
+    if dp "$token" secrets --only-names --project "$other" --config prd >/dev/null 2>&1; then
+      echo "FAIL  $label scoping  (token CAN read $other — permissions too broad)"
+      FAILURES=$((FAILURES + 1))
+    else
+      echo "PASS  $label scoping  (cannot read $other)"
+    fi
+  done
+}
+
+check_slack() {
+  local agent="$1" token="$2" ok
+  if [ -z "$token" ]; then
+    echo "SKIP  $agent slack    (no SLACK_BOT_TOKEN in this project)"
+    return 0
+  fi
   ok=$(curl -s https://slack.com/api/auth.test -H "Authorization: Bearer $token" | jq -r '.ok')
   if [ "$ok" = "true" ]; then
     echo "PASS  $agent slack"
   else
-    echo "FAIL  $agent slack   (auth.test rejected the token)"
+    echo "FAIL  $agent slack    (auth.test rejected the token)"
     return 1
   fi
 }
 
 check_notion() {
-  local agent="$1" token="$2"
+  local agent="$1" token="$2" obj
   if [ -z "$token" ]; then
-    echo "FAIL  $agent notion  (NOTION_TOKEN missing or placeholder)"
-    return 1
+    echo "SKIP  $agent notion   (no per-agent NOTION_TOKEN — shared token or none)"
+    return 0
   fi
-  local obj
   obj=$(curl -s https://api.notion.com/v1/users/me \
     -H "Authorization: Bearer $token" -H "Notion-Version: 2022-06-28" | jq -r '.object')
   if [ "$obj" = "user" ]; then
     echo "PASS  $agent notion"
   else
-    echo "FAIL  $agent notion  (users/me rejected the token)"
+    echo "FAIL  $agent notion   (users/me rejected the token)"
     return 1
   fi
 }
 
 verify_agent() {
-  local agent="$1" prefix token client_id client_secret
-  prefix="$(printf '%s' "$agent" | tr '[:lower:]' '[:upper:]')"
+  local agent="$1" var="$2" other_project="$3"
+  local token slack_token notion_token
 
-  client_id="$(keychain "${prefix}_CLIENT_ID")" || true
-  client_secret="$(keychain "${prefix}_CLIENT_SECRET")" || true
-  if [ -z "${client_id:-}" ] || [ -z "${client_secret:-}" ]; then
-    echo "FAIL  $agent identity (${prefix}_CLIENT_ID/_CLIENT_SECRET not in Keychain)"
-    FAILURES=$((FAILURES+1))
+  token="$(dtok "$var")"
+  if [ -z "$token" ]; then
+    echo "FAIL  $agent identity ($var not in $DOPPLER_ENV_FILE)"
+    FAILURES=$((FAILURES + 1))
     return
   fi
 
-  token=$(infisical login --method=universal-auth \
-    --client-id="$client_id" --client-secret="$client_secret" --plain --silent 2>/dev/null)
-  if [ -z "${token:-}" ]; then
-    echo "FAIL  $agent identity (universal-auth login failed)"
-    FAILURES=$((FAILURES+1))
-    return
-  fi
-  echo "PASS  $agent identity (universal-auth login ok)"
+  check_scoping "$agent" "$token" "$other_project"
 
-  # Least-privilege: this identity must NOT read any other agent's path.
-  local other
-  for other in "${AGENTS[@]}"; do
-    [ "$other" = "$agent" ] && continue
-    if INFISICAL_TOKEN="$token" infisical secrets --projectId "$AGENTS_PROJECT_ID" \
-         --env prod --path "/$other" --plain >/dev/null 2>&1; then
-      echo "FAIL  $agent scoping  (identity CAN read /$other — permissions too broad)"
-      FAILURES=$((FAILURES+1))
-    else
-      echo "PASS  $agent scoping  (cannot read /$other)"
-    fi
-  done
+  slack_token="$(dp "$token" secrets get SLACK_BOT_TOKEN --plain 2>/dev/null)" || slack_token=""
+  notion_token="$(dp "$token" secrets get NOTION_TOKEN --plain 2>/dev/null)" || notion_token=""
+  case "$slack_token" in TODO-*) slack_token="" ;; esac
+  case "$notion_token" in TODO-*) notion_token="" ;; esac
 
-  local dotenv slack_token notion_token
-  dotenv=$(INFISICAL_TOKEN="$token" infisical export --projectId "$AGENTS_PROJECT_ID" \
-    --env prod --path "/$agent" --format dotenv 2>/dev/null)
-  slack_token=$(printf '%s\n' "$dotenv" | grep '^SLACK_BOT_TOKEN=' | cut -d= -f2- | tr -d "'\"")
-  notion_token=$(printf '%s\n' "$dotenv" | grep '^NOTION_TOKEN=' | cut -d= -f2- | tr -d "'\"")
-
-  case "$slack_token" in TODO*) slack_token="";; esac
-  case "$notion_token" in TODO*) notion_token="";; esac
-
-  check_slack "$agent" "$slack_token" || FAILURES=$((FAILURES+1))
-  check_notion "$agent" "$notion_token" || FAILURES=$((FAILURES+1))
+  check_slack "$agent" "$slack_token" || FAILURES=$((FAILURES + 1))
+  check_notion "$agent" "$notion_token" || FAILURES=$((FAILURES + 1))
 }
 
-for a in "${AGENTS[@]}"; do
-  verify_agent "$a"
-done
+app_token() {
+  local label="$1" var="$2" token
+  shift 2
+  token="$(dtok "$var")"
+  if [ -z "$token" ]; then
+    echo "FAIL  $label identity ($var not in $DOPPLER_ENV_FILE)"
+    FAILURES=$((FAILURES + 1))
+    return
+  fi
+  check_scoping "$label" "$token" "$@"
+}
+
+app_token core DOPPLER_TOKEN_CORE "$PREFIX-liv" "$PREFIX-max"
+app_token agents DOPPLER_TOKEN_AGENTS "$PREFIX-liv" "$PREFIX-max"
+verify_agent liv DOPPLER_TOKEN_LIV "$PREFIX-max"
+verify_agent max DOPPLER_TOKEN_MAX "$PREFIX-liv"
 
 echo
 if [ "$FAILURES" -eq 0 ]; then

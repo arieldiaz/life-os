@@ -51,8 +51,9 @@ life-os/
 ├── STREAM.md            ← spec for the EXTERNAL stream store (the stream itself
 │                          lives outside this repo — mostly A/V; see STREAM.md)
 ├── ops/                 ← the capture→sync→transcribe→backup pipeline
-├── infra/               ← self-hosted services. secrets/ = owned Infisical,
-│                          one source of truth for keys (see its runbook.md)
+├── infra/               ← instance infrastructure. secrets/ = the secrets
+│                          layer, one source of truth for keys (Doppler by
+│                          default — see its runbook.md)
 ├── derived/             ← transcripts, summaries, indexes. Disposable, rederivable.
 ├── memory/              ← compounded learnings. The part that makes you smarter.
 │   ├── index.md         ← map of what's in memory; read this first
