@@ -41,6 +41,10 @@ Borrowed with gratitude and skepticism: the prose-workflow style from [addyosman
 | `/compound` | [skills/compound](skills/compound/SKILL.md) | Distill the cycle into memory. Update skills themselves when a lesson is structural. |
 | `/rederive` | [skills/rederive](skills/rederive/SKILL.md) | Regenerate derived artifacts from the raw stream. |
 
+## Status framework
+
+Every item lives in exactly one of four states — 🔄 in-process, 🗓️ scheduled, 🚧 blocked, or ✅ done. No open-ended "someday" pile: if it isn't scheduled with a date, it's killed. Agents signal state as a reaction; the identity reaction means "I've got it." Full spec in [docs/status-framework.md](docs/status-framework.md).
+
 ## Directory map
 
 ```
