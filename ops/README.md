@@ -4,6 +4,28 @@ Capture → sync → transcribe → backup, all local. MacBook records, mini kee
 
 **These scripts are a working first draft** — written blind against your machines. Test each stage with junk files before trusting it with real life. The delete-from-MacBook step in particular: run it a few times watching both ends.
 
+## What you customize vs. what's framework
+
+One rule, so a new user always knows what's theirs to touch:
+
+**`ops/stream-paths.env` is the entire customization surface.** Everything you'd ever change — paths, hostnames, which recording folders, backup repos, performance-gate thresholds — lives in that one file. It's gitignored, so your machine's reality never collides with the framework.
+
+**Everything else in `ops/` is framework** — the scripts (`macbook/`, `mini/`), shared logic (`lib/`), and the launchd plists. You don't edit these; they read their values from `stream-paths.env`. Mechanism lives in the framework; policy lives in your one config file.
+
+The teaching tool is the pairing: every real file has an `.example` twin (`stream-paths.env.example`, `backup/exclude.txt.example`), and the twin's inline comments ARE the docs for every knob. To see everything a fresh instance customized, diff its `stream-paths.env` against the `.example` — that diff is the whole customization. (A private instance like `ariel-os` is exactly this: this framework, plus its own `stream-paths.env` and a couple of gitignored data files.)
+
+## Backup: 3-2-1 with restic
+
+Layered on the pipeline above; all three copies use the same restic repo format, so a restore is identical wherever you pull from.
+
+| Copy | Where | Cadence | What |
+|------|-------|---------|------|
+| 1 — laptop → mini | MacBook, `backup-to-mini.sh` | daily 3am | MacBook-only config/dotfiles + a fresh Brewfile → SFTP repo on the always-on mini. Gated: never runs while recording/on battery. |
+| 2 — mini → SSD | mini, `backup-to-ssd.sh` | monthly, manual | Mini's canonical data → external SSD. A cron reminder nags you to plug it in. |
+| 3 — mini → QNAP | mini, `backup-to-nas.sh` | nightly (when NAS online) | Bulk/video archive to RAID. |
+
+Setup: put the repo passphrase in each machine's Keychain (`security add-generic-password -a "$USER" -s lifeos-restic -w`), fill the `# Backup (restic)` block in `stream-paths.env`, copy `backup/exclude.txt.example` → `backup/exclude.txt`, then load `com.lifeos.backup.plist` on the MacBook. Restore anytime with `restic -r <repo> restore latest --target /tmp/restore`.
+
 ## One-time setup
 
 ### Config (both machines)
