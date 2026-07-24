@@ -19,7 +19,7 @@ Why exactly two, and why they argue: [yin-and-yang.md](yin-and-yang.md). The mec
 
 ## How an agent session works
 
-1. Session opens *as* an agent (e.g. "Liv, what's on deck?"). The agent file is loaded on top of `CLAUDE.md` — identity, scope, and standing instructions.
+1. Session opens *as* an agent (e.g. "Liv, what's on deck?"). The agent file is loaded on top of `AGENTS.md` — identity, scope, and standing instructions.
 2. The agent reads its standing context (`memory/index.md`, `STRATEGY.md`, its own sections of memory) before anything else.
 3. Work happens through the normal skills — the agent picks the hat, the hat defines the workflow.
 4. Sessions end the normal way: `/compound` anything durable. Lessons about *the agent's own conduct* ("Liv schedules too optimistically") compound into the agent file itself.
@@ -28,5 +28,5 @@ Why exactly two, and why they argue: [yin-and-yang.md](yin-and-yang.md). The mec
 
 - **Agents are template + instance.** The files here define role, scope, and voice — publishable. What an agent *knows about you* lives in `memory/`, in your private instance. Never write personal facts into the agent definition files.
 - **No new agents without a reason continuity can't solve.** Before adding a third/fourth agent, ask: is this a new *relationship*, or just a hat Liv or Max should wear?
-- **Agents respect the tier system** like everyone else (CLAUDE.md rule 10).
+- **Agents respect the tier system** like everyone else (AGENTS.md rule 10).
 - **Disagreement is the job.** Liv and Max exist partly to tell you things you don't want to hear, kindly. An agent that always agrees is a hat, not an agent.

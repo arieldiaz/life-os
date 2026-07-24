@@ -45,7 +45,7 @@ git fetch upstream
 git merge upstream/main
 ```
 
-Because the histories are shared, these are small, clean merges. Conflicts appear only in files you deliberately forked from the framework's version — a skill you rewrote, your CLAUDE.md instance block — and those conflicts are informative: they're the framework and your fork of it disagreeing, which is worth the minute of attention.
+Because the histories are shared, these are small, clean merges. Conflicts appear only in files you deliberately forked from the framework's version — a skill you rewrote, your AGENTS.md instance block — and those conflicts are informative: they're the framework and your fork of it disagreeing, which is worth the minute of attention.
 
 ## Send improvements back up
 
@@ -86,7 +86,7 @@ The hygiene rules:
 
 ## What lives where
 
-Framework (this repo, PR-able): skills, commands, agent *definitions*, CLAUDE.md rules, the STREAM.md spec, `ops/` scripts with placeholders, `.example` files.
+Framework (this repo, PR-able): skills, commands, agent *definitions*, AGENTS.md rules, the STREAM.md spec, `ops/` scripts with placeholders, `.example` files.
 
 Instance (private, never upstream): a filled `STRATEGY.md`, `memory/` contents, `derived/`, the real config copies, and everything your agents know about you.
 

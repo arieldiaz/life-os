@@ -97,4 +97,4 @@ Key naming: `SCREAMING_SNAKE`, prefixed by service (`SLACK_BOT_TOKEN`,
 - A secret printed or committed by accident = stop, rotate, scrub, then
   continue.
 - Agents reference keys by name only — this rule is enforced by
-  `CLAUDE.md` and applies to every model, cloud or local.
+  `AGENTS.md` and applies to every model, cloud or local.

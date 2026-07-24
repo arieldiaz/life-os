@@ -46,7 +46,7 @@ Borrowed with gratitude and skepticism: the prose-workflow style from [addyosman
 ```
 life-os/
 ├── README.md            ← you are here
-├── CLAUDE.md            ← operating rules every agent session loads
+├── AGENTS.md            ← operating rules every agent session loads
 ├── STRATEGY.md          ← durable anchor: who you are, what matters, current tracks
 ├── STREAM.md            ← spec for the EXTERNAL stream store (the stream itself
 │                          lives outside this repo — mostly A/V; see STREAM.md)
@@ -84,7 +84,7 @@ Where most frameworks spawn an agent per task, life-os keeps **a small roster of
 
 ## Using with Obsidian
 
-This repo *is* an Obsidian vault — open the folder in Obsidian and you're done. Obsidian is the human surface (essays, weekly reviews, wandering memory via backlinks and graph); AI agents are the loop-runners, working the same files through Claude Code / Cowork and local models. Same markdown, two lenses, no migration ever.
+This repo *is* an Obsidian vault — open the folder in Obsidian and you're done. Obsidian is the human surface (essays, weekly reviews, wandering memory via backlinks and graph); AI agents are the loop-runners, working the same files through any AGENTS.md-aware coding agent and local models. Same markdown, two lenses, no migration ever.
 
 Settings that keep the vault portable:
 
@@ -104,7 +104,7 @@ Settings that keep the vault portable:
   deleted locally)  serves live sessions
 ```
 
-**Privacy tiers** (enforced by CLAUDE.md, honored by every agent):
+**Privacy tiers** (enforced by AGENTS.md, honored by every agent):
 
 | Tier | What | Where it may go |
 |------|------|-----------------|
@@ -112,7 +112,7 @@ Settings that keep the vault portable:
 | 1 | `derived/` | Local by default. A specific artifact may be shared into a cloud-agent session deliberately, per item. |
 | 2 | `memory/`, `STRATEGY.md`, skills, this README | Curated text. This is what cloud agents load and work from. |
 
-The flow: record anywhere → auto-ingest to the spool → sync to the mini → Whisper transcribes with timestamps into `derived/` → cloud agents (Claude et al.) do the high-level loop work from tiers 1–2. Cloud models bring judgment; local models bring eyes and ears. As local models improve, `/rederive` re-runs the eyes-and-ears layer — which is the whole bet.
+The flow: record anywhere → auto-ingest to the spool → sync to the mini → Whisper transcribes with timestamps into `derived/` → cloud agents do the high-level loop work from tiers 1–2. Cloud models bring judgment; local models bring eyes and ears. As local models improve, `/rederive` re-runs the eyes-and-ears layer — which is the whole bet.
 
 **Backups replace git for the stream.** The mini is the single canonical copy (the MacBook deliberately keeps nothing), so the NAS backup is not optional — it's the other half of the design. NAS snapshots guard against ransomware/fat-fingers; a periodic offline or offsite encrypted copy on top guards against the failure modes a powered-on box can't. Append-only data backs up incrementally for free.
 
@@ -148,7 +148,7 @@ The framework is the transferable part (loop, tiers, stream discipline); the `op
 /plugin install life-os
 ```
 
-Or just open this folder in Claude Code / Cowork — `CLAUDE.md` does the rest.
+Or just open this folder in any AGENTS.md-aware coding agent — `AGENTS.md` does the rest.
 
 ## Sources & inspirations
 

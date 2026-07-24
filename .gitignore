@@ -24,3 +24,6 @@ ops/stream-paths.env
 
 # ── macOS noise ──────────────────────────────────────────────
 .DS_Store
+
+# Harness shim: Claude Code only auto-loads a file named CLAUDE.md; keep it local, canonical rules live in AGENTS.md
+/CLAUDE.md

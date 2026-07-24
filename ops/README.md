@@ -86,7 +86,7 @@ The design principle: never kill, defer. Pausing new work is free and resumable;
 
 ## Live sessions vs. the archive
 
-This pipeline is the *archive* path. For **live** voice during sessions (dictating to Claude, live meeting transcription), use whatever tool feels best in the moment — the only rule is its audio artifact must also land in a `CAPTURE_DIRS` folder, so the archive path picks it up regardless. Live use and archival capture are two consumers of the same recording, not two recordings.
+This pipeline is the *archive* path. For **live** voice during sessions (dictating to an agent, live meeting transcription), use whatever tool feels best in the moment — the only rule is its audio artifact must also land in a `CAPTURE_DIRS` folder, so the archive path picks it up regardless. Live use and archival capture are two consumers of the same recording, not two recordings.
 
 ## Debugging
 

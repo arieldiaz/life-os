@@ -14,6 +14,6 @@ derivation: transcript
 ---
 ```
 
-Derivations that read raw stream data are produced **locally** (Qwen on the mini) — `derived_where: local`. Cloud models only appear here for work on already-derived text or explicitly shared items. See CLAUDE.md privacy tiers.
+Derivations that read raw stream data are produced **locally** (Qwen on the mini) — `derived_where: local`. Cloud models only appear here for work on already-derived text or explicitly shared items. See AGENTS.md privacy tiers.
 
 Typical contents: transcripts, summaries, weekly digests, cross-stream indexes ("everything touching the lease decision"), answers to questions asked of the stream. Organize however is useful *right now* — structure here is free to change because nothing here is history.
