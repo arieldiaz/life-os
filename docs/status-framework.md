@@ -11,7 +11,7 @@ the human's message or thread root.
   this; the reaction just makes it explicit on the root.)
 - 🗓️ **scheduled** — flagged to resurface at a set time (reminder/cron set).
   The "keep it alive" state. **No resurface date = kill it, don't park it.**
-- 🚧 **blocked** — waiting on something external before it can move,
+- 🚫 **blocked** — waiting on something external before it can move,
   *including a decision from the human*.
 - ✅ **done** — shipped / confirmed / complete.
 
@@ -24,7 +24,7 @@ The agent's **identity reaction** (e.g. 🦋 / 🦊) is the "I've got it" signal
 there's no separate 👀. Combine identity with state to read who did what:
 
 - 🦋✅ = Liv done · 🦊✅ = Max done
-- 🦋🗓️ = Liv scheduled a follow-up · 🦊🚧 = Max is blocked
+- 🦋🗓️ = Liv scheduled a follow-up · 🦊🚫 = Max is blocked
 
 ## Changelog
 
@@ -32,4 +32,6 @@ there's no separate 👀. Combine identity with state to read who did what:
   Removed 👀 (pickup is the identity reaction), 📌 parked (replaced by
   schedule-or-kill under 🗓️), and the handshake reactions 🎯/❓/🧠/🙈 — the
   thread itself carries acknowledgment, and "waiting on your decision" is just
-  🚧 blocked.
+  🚫 blocked.
+- **2026-07-23** — Standardized the blocked glyph to 🚫 (was 🚧) to match the
+  simplified taxonomy used across instances.
